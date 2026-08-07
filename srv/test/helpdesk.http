@@ -1,0 +1,225 @@
+### Helpdesk Service — HTTP tests
+### Run with: cds watch  (or npm start), then use the VS Code "REST Client" extension
+### to send requests individually (the "Send Request" links above each block).
+
+@host = http://localhost:4004
+@service = {{host}}/odata/v4/helpdesk
+
+### Fixture IDs (from db/data seed CSVs)
+@ticketOpen      = 9cbd5ec2-13a0-4ecb-8939-17e60582a567
+@ticketInProgress = fc5f820d-e790-4692-9ff5-fdadb5530825
+@ticketResolved  = ded10284-90bc-47e9-a84c-b7f261ec217f
+@ticketClosed    = 2ae52ae2-0360-47a7-9a9c-76d75c0cc839
+@categoryHardware = f8d9a43c-2c68-4269-8327-4b9af6fe3513
+@agentAlice      = ae3d5f0b-68cb-43d6-a5a7-5e887329d052
+@agentBrian      = 392df1e5-46c2-4495-aa11-500bff2be80d
+
+
+############################################
+## Service document / metadata
+############################################
+
+### Service document lists all entity sets and operations
+GET {{service}}/
+
+### $metadata describes the EDM (entities, actions, function)
+GET {{service}}/$metadata
+
+
+############################################
+## Read: Categories / Agents / Comments
+############################################
+
+### List categories
+GET {{service}}/Categories
+
+### List agents
+GET {{service}}/Agents
+
+### List comments for one ticket
+GET {{service}}/Comments?$filter=ticket_ID eq '{{ticketResolved}}'
+
+
+############################################
+## Read: Tickets
+############################################
+
+### List all tickets
+GET {{service}}/Tickets
+
+### Get one ticket by ID
+GET {{service}}/Tickets({{ticketOpen}})
+
+### Expand category, assignee and comments on one ticket
+GET {{service}}/Tickets({{ticketResolved}})?$expand=category,assignee,comments
+
+### Filter: only OPEN tickets, sorted by priority
+GET {{service}}/Tickets?$filter=status eq 'OPEN'&$orderby=priority desc
+
+### Filter: URGENT or HIGH priority, select a subset of fields
+GET {{service}}/Tickets?$filter=priority eq 'URGENT' or priority eq 'HIGH'&$select=ticketNumber,subject,priority
+
+### Top 2 tickets, count included
+GET {{service}}/Tickets?$top=2&$count=true
+
+### Get a ticket that doesn't exist -> 404
+GET {{service}}/Tickets(00000000-0000-0000-0000-000000000000)
+
+
+############################################
+## Create: Tickets
+############################################
+
+### Create a valid ticket
+# @name createTicket
+POST {{service}}/Tickets
+Content-Type: application/json
+
+{
+  "subject": "Keyboard keys sticking",
+  "description": "Several keys on the laptop keyboard require extra force to register.",
+  "priority": "LOW",
+  "category_ID": "{{categoryHardware}}",
+  "assignee_ID": "{{agentAlice}}"
+}
+
+### Create fails: missing category_ID -> 400 "A category is required"
+POST {{service}}/Tickets
+Content-Type: application/json
+
+{
+  "subject": "Missing category test"
+}
+
+### Create fails: missing subject -> 400 "A subject is required"
+POST {{service}}/Tickets
+Content-Type: application/json
+
+{
+  "category_ID": "{{categoryHardware}}"
+}
+
+### Create fails: missing both category and subject -> both errors reported
+POST {{service}}/Tickets
+Content-Type: application/json
+
+{
+  "description": "No subject and no category provided."
+}
+
+
+############################################
+## Update: Tickets
+############################################
+
+### Update priority on an open ticket
+PATCH {{service}}/Tickets({{ticketOpen}})
+Content-Type: application/json
+
+{
+  "priority": "URGENT"
+}
+
+### Re-close an already-closed ticket -> structured error ALREADY_CLOSED
+PATCH {{service}}/Tickets({{ticketClosed}})
+Content-Type: application/json
+
+{
+  "status": "CLOSED"
+}
+
+### Close a currently open ticket via plain PATCH (allowed; only *re*-closing is blocked)
+PATCH {{service}}/Tickets({{ticketInProgress}})
+Content-Type: application/json
+
+{
+  "status": "CLOSED"
+}
+
+
+############################################
+## Delete: Tickets
+############################################
+
+### Delete the ticket created above (chains off createTicket's response)
+@newTicketId = {{createTicket.response.body.ID}}
+DELETE {{service}}/Tickets({{newTicketId}})
+
+### Delete a ticket that doesn't exist -> 404
+DELETE {{service}}/Tickets(00000000-0000-0000-0000-000000000000)
+
+
+############################################
+## Action: closeTicket
+############################################
+
+### Close an open ticket with a resolution -> sets status CLOSED, logs a Comment
+POST {{service}}/Tickets({{ticketOpen}})/HelpdeskService.closeTicket
+Content-Type: application/json
+
+{
+  "resolution": "Replaced the battery; laptop powers on normally."
+}
+
+### closeTicket fails: no resolution provided -> 400
+POST {{service}}/Tickets({{ticketInProgress}})/HelpdeskService.closeTicket
+Content-Type: application/json
+
+{}
+
+### closeTicket fails: ticket already closed -> structured error ALREADY_CLOSED
+POST {{service}}/Tickets({{ticketClosed}})/HelpdeskService.closeTicket
+Content-Type: application/json
+
+{
+  "resolution": "Trying to close an already-closed ticket."
+}
+
+### closeTicket fails: ticket does not exist -> 404
+POST {{service}}/Tickets(00000000-0000-0000-0000-000000000000)/HelpdeskService.closeTicket
+Content-Type: application/json
+
+{
+  "resolution": "Ticket does not exist."
+}
+
+
+############################################
+## Action: reassignTicket
+############################################
+
+### Reassign a ticket to a different, valid agent
+POST {{service}}/Tickets({{ticketInProgress}})/HelpdeskService.reassignTicket
+Content-Type: application/json
+
+{
+  "agentID": "{{agentBrian}}"
+}
+
+### reassignTicket fails: no agentID provided -> 400
+POST {{service}}/Tickets({{ticketInProgress}})/HelpdeskService.reassignTicket
+Content-Type: application/json
+
+{}
+
+### reassignTicket fails: agent does not exist -> 404
+POST {{service}}/Tickets({{ticketInProgress}})/HelpdeskService.reassignTicket
+Content-Type: application/json
+
+{
+  "agentID": "00000000-0000-0000-0000-000000000000"
+}
+
+
+############################################
+## Function: getTicketCount
+############################################
+
+### Count all tickets (no status filter)
+GET {{service}}/getTicketCount()
+
+### Count only OPEN tickets
+GET {{service}}/getTicketCount(status='OPEN')
+
+### Count only CLOSED tickets
+GET {{service}}/getTicketCount(status='CLOSED')

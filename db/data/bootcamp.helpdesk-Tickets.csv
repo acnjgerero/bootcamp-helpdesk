@@ -1,0 +1,9 @@
+ID;ticketNumber;subject;description;status;priority;category_ID;assignee_ID
+9cbd5ec2-13a0-4ecb-8939-17e60582a567;TCK-0001;Laptop won't power on;Laptop does not turn on after the latest OS update. Battery light is off.;OPEN;HIGH;f8d9a43c-2c68-4269-8327-4b9af6fe3513;ae3d5f0b-68cb-43d6-a5a7-5e887329d052
+fc5f820d-e790-4692-9ff5-fdadb5530825;TCK-0002;Cannot install IDE update;The IDE update fails with a permissions error on macOS.;IN_PROGRESS;MEDIUM;979f74c6-5f20-4a14-ac97-b7122927bd5e;392df1e5-46c2-4495-aa11-500bff2be80d
+83df680f-7eaf-4d33-b8b3-c4214a62b547;TCK-0003;VPN connection keeps dropping;VPN disconnects every few minutes while working remotely.;OPEN;URGENT;455a51d4-93fc-4036-8297-fa63e8dc1f6a;fb03b195-240f-4d6f-80ce-65f096ea725b
+ded10284-90bc-47e9-a84c-b7f261ec217f;TCK-0004;Password reset not working;Reset link in the email leads to an expired token error.;RESOLVED;MEDIUM;1db7b50f-52f3-4449-b629-a51493b73f82;d370a4a2-3d38-4185-9fe0-93336a690bb2
+12f7316c-9622-4cbb-984c-b5988d78def8;TCK-0005;Monitor flickering;External monitor flickers intermittently when connected via HDMI.;OPEN;LOW;f8d9a43c-2c68-4269-8327-4b9af6fe3513;ae3d5f0b-68cb-43d6-a5a7-5e887329d052
+2ae52ae2-0360-47a7-9a9c-76d75c0cc839;TCK-0006;Request access to shared drive;New hire needs access to the team shared drive.;CLOSED;LOW;1db7b50f-52f3-4449-b629-a51493b73f82;392df1e5-46c2-4495-aa11-500bff2be80d
+bd1af9f4-33f0-460b-9d63-0f2abbede6e8;TCK-0007;Slow application performance;The CRM application takes over a minute to load the dashboard.;IN_PROGRESS;HIGH;979f74c6-5f20-4a14-ac97-b7122927bd5e;fb03b195-240f-4d6f-80ce-65f096ea725b
+176a68b7-2c03-4dd5-a4c8-0ff7a7980c04;TCK-0008;Printer not found on network;Office printer is no longer discoverable from any workstation.;OPEN;MEDIUM;455a51d4-93fc-4036-8297-fa63e8dc1f6a;d370a4a2-3d38-4185-9fe0-93336a690bb2

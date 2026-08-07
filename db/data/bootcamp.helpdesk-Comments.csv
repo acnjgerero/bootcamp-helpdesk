@@ -1,0 +1,11 @@
+ID;ticket_ID;text
+8c642958-ba0d-4bce-bd29-24b5b904e51a;9cbd5ec2-13a0-4ecb-8939-17e60582a567;Tried a hard reset, no response. Escalating to hardware team.
+519771cf-87fa-4529-a0f6-a25aaf7c6c2d;fc5f820d-e790-4692-9ff5-fdadb5530825;Asked user to run the installer with sudo, waiting on confirmation.
+7da71d76-e007-4376-b7b8-01e3a52b94ae;83df680f-7eaf-4d33-b8b3-c4214a62b547;Checked firewall logs, nothing unusual so far. Investigating further.
+284f608f-b9bc-4754-8cc0-bad8b8500282;ded10284-90bc-47e9-a84c-b7f261ec217f;Issued a new reset link manually, user confirmed access restored.
+021ff19b-12a7-4883-a519-8225eca284eb;ded10284-90bc-47e9-a84c-b7f261ec217f;Marking as resolved after user confirmation.
+c81161a0-a7db-47d8-bb12-679bb513ee8e;12f7316c-9622-4cbb-984c-b5988d78def8;Requested user try a different HDMI cable.
+222913f7-ff6b-47e3-9572-ec21ced39b98;2ae52ae2-0360-47a7-9a9c-76d75c0cc839;Access granted and verified with the user.
+6aa59427-e6c4-49f1-9083-2d0d36fda003;bd1af9f4-33f0-460b-9d63-0f2abbede6e8;Reproduced the slowdown, looks related to a recent DB index change.
+3ce0e216-9a33-4689-9a6c-81f354000fbe;bd1af9f4-33f0-460b-9d63-0f2abbede6e8;Working with the DB team on a fix.
+bdd0999c-ff79-40fe-b8b0-874fa89143f8;176a68b7-2c03-4dd5-a4c8-0ff7a7980c04;Confirmed the printer is offline; checking network switch port.
