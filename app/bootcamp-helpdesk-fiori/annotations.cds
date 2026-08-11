@@ -75,6 +75,11 @@ annotate service.Tickets with @(
             Value : assignee.name,
             Label : 'Assignee',
         },
+        {
+            $Type : 'UI.DataField',
+            Value : category.name,
+            Label : 'Category',
+        },
     ],
     UI.HeaderInfo: {
         $Type : 'UI.HeaderInfoType',
@@ -88,9 +93,9 @@ annotate service.Tickets with @(
     },
     UI.SelectionFields: [
         assignee.name,
-        subject,
         status,
-        priority
+        priority,
+        category.name,
     ]
 );
 
@@ -102,7 +107,7 @@ annotate service.Tickets with {
         Common.Label: 'Status',
         Common.ValueList : {
             $Type : 'Common.ValueListType',
-            CollectionPath : 'Tickets',
+            CollectionPath : 'Statuses',
             Parameters : [
                 {
                     $Type : 'Common.ValueListParameterInOut',
@@ -216,4 +221,22 @@ annotate service.Comments with @(
         },
     ]
 );
+
+annotate service.Categories with {
+    name @(
+        Common.Label : 'Category',
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'Categories',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : name,
+                    ValueListProperty : 'name',
+                },
+            ],
+        },
+        Common.ValueListWithFixedValues : true,
+    )
+};
 
