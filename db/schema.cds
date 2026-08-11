@@ -44,3 +44,11 @@ entity Comments : cuid, managed {
   ticket : Association to Tickets;
   text   : String(1000);
 }
+
+entity Statuses : cuid {
+  status  : TicketStatus;
+}
+
+entity Priorities : cuid {
+  priority  : Priority;
+}

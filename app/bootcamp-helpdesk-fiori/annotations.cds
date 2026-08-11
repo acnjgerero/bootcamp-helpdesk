@@ -22,11 +22,23 @@ annotate service.Tickets with @(
                 $Type : 'UI.DataField',
                 Label : 'Status',
                 Value : status,
+                Criticality : statusCriticality,
+                CriticalityRepresentation : #WithIcon,
             },
             {
                 $Type : 'UI.DataField',
                 Label : 'Priority',
                 Value : priority,
+                Criticality : priorityCriticality,
+                CriticalityRepresentation : #WithoutIcon,
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : assignee_ID,
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : category_ID,
             },
         ],
     },
@@ -64,11 +76,15 @@ annotate service.Tickets with @(
             $Type : 'UI.DataField',
             Label : 'Status',
             Value : status,
+            Criticality : statusCriticality,
+            CriticalityRepresentation : #WithIcon,
         },
         {
             $Type : 'UI.DataField',
             Label : 'Priority',
             Value : priority,
+            Criticality : priorityCriticality,
+            CriticalityRepresentation : #WithoutIcon,
         },
         {
             $Type : 'UI.DataField',
@@ -96,7 +112,14 @@ annotate service.Tickets with @(
         status,
         priority,
         category.name,
-    ]
+    ],
+    UI.Identification : [
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'HelpdeskService.closeTicket',
+            Label : 'Close Ticket',
+        },
+    ],
 );
 
 annotate service.Tickets with {
@@ -122,7 +145,7 @@ annotate service.Tickets with {
         Common.Label: 'Priority',
         Common.ValueList : {
             $Type : 'Common.ValueListType',
-            CollectionPath : 'Tickets',
+            CollectionPath : 'Priorities',
             Parameters : [
                 {
                     $Type : 'Common.ValueListParameterInOut',
@@ -163,43 +186,51 @@ annotate service.Agents with {
 
 
 annotate service.Tickets with {
-    category @Common.ValueList : {
-        $Type : 'Common.ValueListType',
-        CollectionPath : 'Categories',
-        Parameters : [
-            {
-                $Type : 'Common.ValueListParameterInOut',
-                LocalDataProperty : category_ID,
-                ValueListProperty : 'ID',
-            },
-            {
-                $Type : 'Common.ValueListParameterDisplayOnly',
-                ValueListProperty : 'name',
-            },
-        ],
-    }
+    category @(
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'Categories',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : category_ID,
+                    ValueListProperty : 'ID',
+                },
+                {
+                    $Type : 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty : 'name',
+                },
+            ],
+        },
+        Common.Text: category.name,
+        Common.TextArrangement: #TextOnly
+    )
 };
 
 annotate service.Tickets with {
-    assignee @Common.ValueList : {
-        $Type : 'Common.ValueListType',
-        CollectionPath : 'Agents',
-        Parameters : [
-            {
-                $Type : 'Common.ValueListParameterInOut',
-                LocalDataProperty : assignee_ID,
-                ValueListProperty : 'ID',
-            },
-            {
-                $Type : 'Common.ValueListParameterDisplayOnly',
-                ValueListProperty : 'name',
-            },
-            {
-                $Type : 'Common.ValueListParameterDisplayOnly',
-                ValueListProperty : 'email',
-            },
-        ],
-    }
+    assignee @(
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'Agents',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : assignee_ID,
+                    ValueListProperty : 'ID',
+                },
+                {
+                    $Type : 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty : 'name',
+                },
+                {
+                    $Type : 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty : 'email',
+                },
+            ],
+        },
+        Common.Text: assignee.name,
+        Common.TextArrangement: #TextOnly
+    )
 };
 
 annotate service.Comments with @(
@@ -208,6 +239,7 @@ annotate service.Comments with @(
             $Type : 'UI.DataField',
             Value : ticket.ticketNumber,
             Label : 'Ticket',
+            @UI.Hidden,
         },
         {
             $Type : 'UI.DataField',

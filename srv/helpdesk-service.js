@@ -32,15 +32,45 @@ class HelpdeskService extends cds.ApplicationService {
       const { ID } = req.params[0];
       const { resolution } = req.data;
 
-      // TODO 1: reject with 400 if `resolution` is missing.
-      // TODO 2: look up the ticket (SELECT.one.from(Tickets, ID).columns('status'));
-      //         reject with 404 if it doesn't exist.
-      // TODO 3: reject with a structured error (code: 'ALREADY_CLOSED') if the
-      //         ticket's status is already 'CLOSED'.
-      // TODO 4: UPDATE(Tickets, ID) to set status to 'CLOSED'.
-      // TODO 5: INSERT.into(Comments) a new comment on this ticket recording
-      //         the resolution text (e.g. `Ticket closed: ${resolution}`).
-      // TODO 6: return the updated ticket — SELECT.one.from(Tickets, ID).
+      if (!resolution) {
+        req.error(400, 'Transaction Failed. Please add a resolution comment.');
+      }
+
+      // Look up the ticket
+      const ticket = await SELECT.one
+        .from(Tickets)
+        .where({ ID })
+        .columns('ID', 'status');
+
+      if (!ticket) {
+        req.error(404, `Ticket ${ID} not found.`);
+      }
+
+      // Prevent closing an already closed ticket
+      if (ticket.status === 'CLOSED') {
+        req.reject(400, {
+          code: 'ALREADY_CLOSED',
+          message: 'This ticket has already been closed.'
+        });
+      }
+
+      // Close the ticket
+      await UPDATE(Tickets)
+        .set({
+          status: 'CLOSED'
+        })
+        .where({ ID });
+
+      // Record resolution comment
+      await INSERT.into(Comments).entries({
+        ticket_ID: ID,
+        text: `Ticket closed: ${resolution}`
+      });
+
+      // Return updated ticket
+      return await SELECT.one
+        .from(Tickets)
+        .where({ ID });
     });
 
     // ---- Custom action: reassignTicket ----
